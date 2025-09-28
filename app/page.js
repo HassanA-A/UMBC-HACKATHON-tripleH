@@ -2,6 +2,8 @@
 
 import { useRef, useState, useEffect } from "react";
 import supabase from "../lib/supabaseClient";  // 👈 make sure this file exists
+import ResumeUpload from "../components/ResumeUpload";
+
 
 import VoiceTest from "../components/VoiceTest"; // adjust path if needed
 
@@ -153,6 +155,12 @@ export default function Home() {
       localStorage.setItem("interviewEvents", JSON.stringify(events));
     } catch {}
   }, [events]);
+  useEffect(() => {
+  supabase.auth.getSession().then(({ data }) => {
+    console.log("🔑 Current session:", data.session);
+  });
+}, []);
+
 
   const roundNowToNext5 = () => {
     const now = new Date();
@@ -235,7 +243,7 @@ export default function Home() {
         </div>
       </header>
       <div className="flex justify-between items-center">
-  <div className="text-xl font-bold tracking-tight">Interview Bot</div>
+  <div className="text-xl font-bold tracking-tight"></div>
   <div>
     {!user ? (
       <button 
@@ -268,14 +276,11 @@ export default function Home() {
                 <div>
                   <div className="mb-3 text-sm font-medium">Resume</div>
                   <div className="flex justify-center">
-                    <UploadPill label="Upload Resume" onClick={pickResume} />
-                    <input
-                      ref={resumeInputRef}
-                      type="file"
-                      accept=".pdf,.doc,.docx,.txt"
-                      className="hidden"
-                      onChange={(e) => setResumeName(e.target.files?.[0]?.name || "")}
-                    />
+                    {user ? (
+                      <ResumeUpload user={user} />
+                    ) : (
+                      <p className="text-sm text-gray-400">Log in to upload your resume.</p>
+                    )}
                   </div>
                   {resumeName && (
                     <p className="mt-2 text-xs text-white/70 text-center">Selected: {resumeName}</p>
