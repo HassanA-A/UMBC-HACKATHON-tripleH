@@ -1,10 +1,59 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import supabase from "../lib/supabaseClient";  // 👈 make sure this file exists
+
 import VoiceTest from "../components/VoiceTest"; // adjust path if needed
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("resume");
+  useEffect(() => {
+  const test = async () => {
+    const { data, error } = await supabase.from("users").select("*");
+    console.log("✅ Supabase test:", data, error);
+  };
+  test();
+}, []);
+
+
+  // ==== Supabase Auth ====
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // On mount, check for existing session
+    const getUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+      setLoading(false);
+    };
+    getUser();
+
+    // Subscribe to auth state changes
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google", // 👈 change provider if needed
+    });
+    if (error) console.error("Login error:", error.message);
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error("Logout error:", error.message);
+  };
 
   // ==== Interview mic + transcript ====
   const [recording, setRecording] = useState(false);
@@ -185,6 +234,24 @@ export default function Home() {
           </nav>
         </div>
       </header>
+      <div className="flex justify-between items-center">
+  <div className="text-xl font-bold tracking-tight">Interview Bot</div>
+  <div>
+    {!user ? (
+      <button 
+        onClick={handleLogin} 
+        className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">
+        Sign in with Google
+      </button>
+    ) : (
+      <button 
+        onClick={handleLogout} 
+        className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">
+        Logout
+      </button>
+    )}
+  </div>
+</div>
 
       {/* Main */}
       <main className="flex-1">

@@ -13,18 +13,19 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Interview Bot",
-  description: "AI-powered resume refinement and interview prep",
-  icons: {
-    icon: "/favicon.ico", // make sure this file exists in /public
-  },
+  description: "Interview prep and resume refinement",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        {/* ✅ Explicit favicon link (make sure the file exists in /public) */}
+        <link rel="icon" href="/favicon-classic.ico?v=7" />
+        {/* If you want to try another variant, swap the filename */}
+        {/* <link rel="icon" href="/favicon-32only.ico?v=7" /> */}
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
