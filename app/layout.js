@@ -15,7 +15,7 @@ export const metadata = {
   title: "Interview Bot",
   description: "AI-powered resume refinement and interview prep",
   icons: {
-    icon: "/favicon.png", // make sure this file exists in /public
+    icon: "/favicon.ico", // make sure this file exists in /public
   },
 };
 
